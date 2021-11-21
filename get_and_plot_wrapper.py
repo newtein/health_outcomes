@@ -16,9 +16,10 @@ class WrapperClass:
         self.global_incidence = None
         self.population_df = GetAgeSex(self.year).read_file_by_age()
         self.get_disease_df()
-        print(self.population_df.columns)
-        print(self.prevalence_df.columns)
-        print(self.incidence_df.columns)
+        self.pop_col = 'POPEST{}_CIV'.format(self.year)
+        # print(self.population_df.columns)
+        # print(self.prevalence_df.columns)
+        # print(self.incidence_df.columns)
 
     def get_disease_df(self):
         if self.disease == 'ASTHMA':
@@ -38,39 +39,39 @@ class WrapperClass:
 
     def calculate_prevalance_cases(self, x):
         if not np.isnan(x['Prevalence']):
-            return (x['POPEST2017_CIV']*x['Prevalence'])/1000
+            return (x[self.pop_col]*x['Prevalence'])/100
         else:
-            return (x['POPEST2017_CIV']*self.get_global(type='GLOBAL'))/1000
+            return (x[self.pop_col]*self.get_global(type='GLOBAL'))/100
 
     def calculate_prevalance_cases_high(self, x):
         if not np.isnan(x['high_CI']):
-            return (x['POPEST2017_CIV']*x['high_CI'])/1000
+            return (x[self.pop_col]*x['high_CI'])/100
         else:
-            return (x['POPEST2017_CIV'] * self.get_global(type='GLOBAL_HIGH')) / 1000
+            return (x[self.pop_col] * self.get_global(type='GLOBAL_HIGH')) / 100
 
     def calculate_prevalance_cases_low(self, x):
         if not np.isnan(x['low_CI']):
-            return (x['POPEST2017_CIV']*x['low_CI'])/1000
+            return (x[self.pop_col]*x['low_CI'])/100
         else:
-            return (x['POPEST2017_CIV'] * self.get_global(type='GLOBAL_LOW')) / 1000
+            return (x[self.pop_col] * self.get_global(type='GLOBAL_LOW')) / 100
 
     def calculate_at_risk(self, x):
-        return x['POPEST2017_CIV'] - x['prevalence_cases']
+        return x[self.pop_col] - x['prevalence_cases']
 
     def calculate_at_risk_high(self, x):
-        return x['POPEST2017_CIV'] - x['prevalence_cases_high']
+        return x[self.pop_col] - x['prevalence_cases_high']
 
     def calculate_at_risk_low(self, x):
-        return x['POPEST2017_CIV'] - x['prevalence_cases_low']
+        return x[self.pop_col] - x['prevalence_cases_low']
 
     def calculate_incidence_cases(self, x):
-        return (x['at_risk']*x['incidence_rate'])/1000
+        return (x['at_risk']*x['incidence_rate'])/100
 
     def calculate_incidence_cases_high(self, x):
-        return (x['at_risk_high']*x['incidence_rate'])/1000
+        return (x['at_risk_high']*x['incidence_rate'])/100
 
     def calculate_incidence_cases_low(self, x):
-        return (x['at_risk_low']*x['incidence_rate'])/1000
+        return (x['at_risk_low']*x['incidence_rate'])/100
 
     def calculate_prevalence_and_incidence_cases(self):
         self.prevalence_count = self.population_df.merge(self.prevalence_df, left_on='STATE', right_on='State Code', how='left')
@@ -92,6 +93,7 @@ class WrapperClass:
         self.incident_count.drop(['95% CI', '_state', '_STATE'], axis=1, inplace=True)
 
         fw = "{}/{}".format(OUTPUT_FILE, "{}_{}_{}.csv".format(self.disease, self.year, self.pop_type))
+        print("Written: {}".format(fw))
         self.incident_count.to_csv(fw, index=False)
 
 

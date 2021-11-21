@@ -1,12 +1,19 @@
 from read_brfss_file import ReadBRFSS
 from read_acbs import ReadACBS
+from config import CONFIG
+import pandas as pd
 
 
 class AsthmaIncidenceRate:
     def __init__(self, year):
-        self.year = year
-        self.brfss = ReadBRFSS(self.year).get_df()
-        self.acbs = ReadACBS(self.year).get_df()
+        # self.year = year
+        self.years = CONFIG.get("analysis_years")
+        self.brfss, self.acbs = pd.DataFrame(), pd.DataFrame()
+        for year in self.years:
+            self.brfss = self.brfss.append(ReadBRFSS(year).get_df())
+            self.acbs = self.acbs.append(ReadACBS(year).get_df())
+        self.brfss = self.brfss.reset_index()
+        self.acbs = self.acbs.reset_index()
 
     def get_never_asthma(self):
         lifetime_asthma_ques = self.brfss.groupby(['_STATE', 'ASTHMA3'])['ASTHMA3'].agg(['count']).reset_index()

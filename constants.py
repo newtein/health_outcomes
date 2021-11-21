@@ -2,18 +2,52 @@ MANDATORY_BRFSS_COLUMNS = ["_STATE", "FMONTH", "IDATE", "IMONTH", "IDAY", "IYEAR
                      "LADULT", "CADULT",
                     "DISPCODE", "NUMADULT", "NUMMEN", "NUMWOMEN", "CSTATE1",
                     "HHADULT", "HLTHPLN1", "MEDCOST", "ASTHMA3", "ASTHNOW",
-                    "CHCCOPD1", "SEX", "EDUCA", "RENTHOM1", "EMPLOY1", "INCOME2",
+                    "CHCCOPD1", "EDUCA", "RENTHOM1", "EMPLOY1", "INCOME2",
                     "SMOKE100", "SMOKDAY2", "STOPSMK2", "LASTSMK2", "USENOW3",
-                    "ECIGARET", "ECIGNOW", "COPDCOGH", "COPDFLEM", "COPDBRTH",
-                    "COPDBTST", "COPDSMOK", "ASTHMAGE", "ASATTACK", "ASERVIST",
-                    "ASDRVIST", "ASRCHKUP", "ASACTLIM", "ASYMPTOM", "ASNOSLEP",
-                    "ASTHMED3", "ASINHALR", "MEDICARE", "DELAYMED", "NOCOV121",
-                    "LSTCOVRG", "MEDSCOS1", "MEDBILL1", "MARIJANA", "USEMRJN1",
-                    "RSNMRJNA", "LCSFIRST", "LCSLAST", "LCSNUMCG", "LCSCTSCN",
-                    "SDHBILLS", "SDHMOVE", "SDHFOOD", "SDHMEALS", "SDHMONEY",
-                    "CASTHDX2", "CASTHNO2", "_IMPRACE", "_CHISPNC", "_CRACE1",
+                    "ECIGARET", "ECIGNOW",
+                    "MEDICARE", "NOCOV121",
+                    "LSTCOVRG", "MEDBILL1",
+                    "CASTHDX2", "CASTHNO2", "_CHISPNC", "_CRACE1",
                     "_CPRACE", "_HCVU651", "_LTASTH1", "_CASTHM1", "_ASTHMS1",
                     "_PRACE1", "_MRACE1", "_RACEG21", "_CHLDCNT", "_INCOMG",
-                    "_SMOKER3", "_RFSMOK3", "_ECIGSTS", "_CURECIG", "_PNEUMO2"]
+                    "_SMOKER3", "_RFSMOK3"]
 
 OUTPUT_FILE = 'output_files'
+OUTPUT_IMAGE = 'output_images'
+US_CENSUS_DIR = "us_census"
+CENSUS_DATA_PATH = US_CENSUS_DIR+"/2010_2019_population.csv"
+
+CARB = [6, 8, 41, 9, 23, 24,25, 34, 36, 44, 50]
+
+EXCLUDE_STATES = [11, 10, 42, 53]
+
+## Odds Ratio
+DATA_ODDS_RATIO_MODULE = "odds_ratio_module/data"
+
+COLUMNS_FOR_ODD_RATIO = ["SMOKE100", "_STATE", "ASTHMA3", "ASTHNOW", "_AGEG5YR", "SEX", "_RACE_G1",
+"INCOME2", "_INCOMG", "EDUCA", "_EDUCAG", "_BMI5", "_BMI5CAT", "CHILDREN", "NUMADULT", "HHADULT", "_CHLDCNT"]
+
+
+COLUMNS_FOR_ODD_RATIO_FOR_CHILD = ["_STATE", "CASTHDX2", "CASTHNO2", "RCSGENDR", "_CPRACE",
+"INCOME2", "_INCOMG", "CHILDREN", "NUMADULT", "HHADULT", "_CHLDCNT"]
+
+RENAME  = {
+    "SEX1": "SEX",
+    "SOMKE100": "SMOKE100"
+}
+
+# MODELING_COLUMNS = ["TAILPIPE", "_AGEG5YR", "SEX", "_RACE_G1", 'POVERTY', 'POPEST2017_CIV', "_EDUCAG", "_BMI5CAT",
+#                     "ASTHMA"]
+#
+# MODELING_COLUMNS_FOR_CHILD = ["TAILPIPE", "RCSGENDR", "_CPRACE", 'POVERTY', 'POPEST2017_CIV', "ASTHMA"]
+
+
+MODELING_COLUMNS = ["TAILPIPE", "_AGEG5YR", "SEX", "_RACE_G1", 'POVERTY', 'DENSITY', "_EDUCAG", "_BMI5CAT",
+                    "ASTHMA"]
+
+MODELING_COLUMNS_FOR_CHILD = ["TAILPIPE", "RCSGENDR", "_CPRACE", 'POVERTY', 'DENSITY', "ASTHMA"]
+
+
+
+
+

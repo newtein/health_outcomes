@@ -18,7 +18,16 @@ class ReadACBS:
                                          .get(self.of))
 
     def get_df(self, all=False):
-        return ReadSAS().get_df(self.filename)
+        df = ReadSAS().get_df(self.filename)
+        try:
+            """
+            Handling inconsistencies in the files
+            """
+            df['_state'] = df['_STATE']
+            df['seqno'] = df['SEQNO']
+        except:
+            pass
+        return df
 
 
 if __name__ == "__main__":
