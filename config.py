@@ -1,5 +1,6 @@
 CONFIG = {
     "analysis_years": ["2016", "2017", "2018"],
+    "epa_regions": [1, 3, 8, 9, 10],
     "disease": 'ASTHMA',
     "BRFSS": {
         "2016": 'LLCP2016.XPT',

@@ -4,6 +4,7 @@ import statsmodels.api as sm
 import numpy as np
 from constants import *
 from sklearn.metrics import accuracy_score
+from config import CONFIG
 
 
 class OddsRatio:
@@ -37,7 +38,9 @@ class OddsRatio:
     def get_results(self):
         odds_ratio = {}
         accuracy_dict = {}
-        for index, epa_region in enumerate([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]):
+        epa_regions = CONFIG.get("epa_regions")
+        t = [0] + epa_regions
+        for index, epa_region in enumerate(t):
             if epa_region == 0 or (epa_region in self.carb_regions and epa_region in self.noncarb_regions):
                 if epa_region == 0:
                     tdf = self.mdf

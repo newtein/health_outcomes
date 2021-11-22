@@ -20,6 +20,7 @@ class RegionWisePlotThreeYears:
         self.fnames = self.get_fnames()
         dfs = [pd.read_csv(fname) for fname in self.fnames]
         self.dfs_carb, self.dfs_noncarb = [], []
+        self.cmap = plt.get_cmap("Paired")
         for index in range(len(dfs)):
             dfs[index] = dfs[index][dfs[index]['CHILD'] == 1]
             dfs[index] = dfs[index][~dfs[index]['STATE'].isin(EXCLUDE_STATES)]
@@ -67,7 +68,7 @@ class RegionWisePlotThreeYears:
         return s
 
     def get_bar_annote(self, x):
-        if len(x) == 6:
+        if len(x) == 5:
             return 0.75
         return 0.6
 
@@ -99,7 +100,7 @@ class RegionWisePlotThreeYears:
 
                 #plt.xlim(0, None)
                 x_pos = [2, 4, 6, 9, 11, 13]
-                plt.bar(x_pos, prevalences_carb + prevalences_noncarb, width=1.5)
+                plt.bar(x_pos, prevalences_carb + prevalences_noncarb, width=1.5, color=self.cmap(0))
                 idx = 0
                 for prevalence_carb, c_carb in zip(prevalences_carb, cs_carb):
                     plt.errorbar(x_pos[idx], prevalence_carb, yerr=prevalence_carb - c_carb, color='r', label='95% CI')
@@ -107,32 +108,33 @@ class RegionWisePlotThreeYears:
                 for prevalence_noncarb, c_noncarb in zip(prevalences_noncarb, cs_noncarb):
                     plt.errorbar(x_pos[idx], prevalence_noncarb, yerr=prevalence_noncarb - c_noncarb, color='r', label='95% CI')
                     idx += 1
-                plt.ylabel("Number of cases")
+                plt.ylabel("Number of cases", fontsize=12)
                 combined_x_ticks = sorted(x_pos+[4.1, 11.1])
-                plt.xticks(combined_x_ticks, ['2016', '2017', '\n\nCARB States', '2018', '2016', '2017','\n\nNon-CARB States', '2018'])
+                xt_labels = ['2016', '2017', '\n\nCARB States', '2018', '2016', '2017','\n\nNon-CARB States', '2018']
+                plt.xticks(combined_x_ticks, xt_labels, fontsize=12)
                 #plt.xticks([4, 11], ['CARB States', 'Non-CARB States'])
                 idx = 0
                 ax2 = ax.twinx()
-                ax2.scatter(x_pos, pops_carb + pops_noncarb, color='k', marker='^', s=8, label='Population trend')
-                ax2.set_ylabel("Population")
+                ax2.scatter(x_pos, pops_carb + pops_noncarb, color=self.cmap(1), marker='^', s=8, label='Population trend')
+                ax2.set_ylabel("Population", fontsize=12)
                 a, b = [], []
                 bar_annote_size = 8
                 for prevalence_carb, pop_carb in zip(prevalences_carb, pops_carb):
-                    carb_per = "{:.2f}%".format((prevalence_carb*100)/pop_carb)
+                    carb_per = "{:.1f}%".format((prevalence_carb*100)/pop_carb)
                     alignment = self.get_bar_annote(carb_per)
-                    ax.text(x_pos[idx]-alignment, prevalence_carb/3, carb_per, size=8, color='w')
+                    ax.text(x_pos[idx]-alignment, prevalence_carb/3, carb_per, size=10, color='k', alpha=0.8)
                     a.append(x_pos[idx])
                     b.append(pop_carb)
                     idx += 1
-                k_plot_style = {"color": 'g',
+                k_plot_style = {"color": self.cmap(1),
                                 "linewidth": 0.5,
                                 "linestyle": '--'}
                 ax2.plot(a, b, **k_plot_style)
                 a, b = [], []
                 for prevalence_noncarb, pop_noncarb in zip(prevalences_noncarb, pops_noncarb):
-                    noncarb_per = "{:.2f}%".format((prevalence_noncarb*100)/pop_noncarb)
+                    noncarb_per = "{:.1f}%".format((prevalence_noncarb*100)/pop_noncarb)
                     alignment = self.get_bar_annote(noncarb_per)
-                    ax.text(x_pos[idx]-alignment, prevalence_noncarb/3, noncarb_per, size=8, color='w')
+                    ax.text(x_pos[idx]-alignment, prevalence_noncarb/3, noncarb_per, size=10, color='k', alpha=0.8)
                     a.append(x_pos[idx])
                     b.append(pop_noncarb)
                     idx += 1
@@ -140,16 +142,16 @@ class RegionWisePlotThreeYears:
                     plt.legend(loc='upper right', prop={'size': 11})
                 ax2.plot(a, b, **k_plot_style)
                 ax.spines['top'].set_visible(False)
-                ax.spines['right'].set_visible(False)
+                # ax.spines['right'].set_visible(False)
                 ax.spines['bottom'].set_visible(False)
-                ax.spines['left'].set_visible(False)
+                # ax.spines['left'].set_visible(False)
                 ax.get_yaxis().set_major_formatter(
                     matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
 
                 ax2.spines['top'].set_visible(False)
-                ax2.spines['right'].set_visible(False)
+                # ax2.spines['right'].set_visible(False)
                 ax2.spines['bottom'].set_visible(False)
-                ax2.spines['left'].set_visible(False)
+                # ax2.spines['left'].set_visible(False)
                 ax2.get_yaxis().set_major_formatter(
                     matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
 
