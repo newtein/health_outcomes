@@ -131,6 +131,10 @@ CONFIG = {
                 "8": 10e10
             }
         }
+    },
+    "TRAP_GLOBAL": {
+        "value": "0.176",
+        "src": "https://www.sciencedirect.com/science/article/pii/S1047279720303446?via%3Dihub#tbls5"
     }
 
 }

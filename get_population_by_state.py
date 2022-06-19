@@ -46,6 +46,7 @@ class GetAgeSex:
         surface_df = self.get_surface_area_for_density()
         pop_estimate = pop_estimate.merge(surface_df, left_on='NAME', right_on='State and other areas2', how='left')
         pop_estimate['DENSITY'] = pop_estimate[year_col] / pop_estimate['surface_area']
+        pop_estimate['population'] = pop_estimate[year_col].tolist()
         return pop_estimate
 
     def get_surface_area_for_density(self):

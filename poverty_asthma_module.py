@@ -5,10 +5,16 @@ from constants import *
 
 
 class PovertyModule:
-    def __init__(self):
+    def __init__(self, pop_type):
+        self.pop_type = pop_type
         obj = ModelingData()
         df = obj.get_data_with_epa_region()
         df = df[~df['_STATE'].isin(EXCLUDE_STATES)]
+        if self.pop_type == 'ADULT':
+            self.weighted_col = '_LLCPWT2'
+        else:
+            self.weighted_col = "_CLLCPWT"
+        df = df[~pd.isna(df[self.weighted_col])]
         population_df = GetAgeSex('2017').read_file_by_population()
         t = population_df
         t = t[t["STATE"] == 0]
@@ -17,8 +23,8 @@ class PovertyModule:
         self.df = df.merge(population_df[['STATE', 'POPEST2017_CIV']], left_on="_STATE", right_on="STATE", how="left")
 
     def get_data(self):
-        carb = self.df[self.df['TAILPIPE'] == 1]
-        noncarb = self.df[self.df['TAILPIPE'] == 0]
+        carb = self.df[self.df['NONCARB'] == 0]
+        noncarb = self.df[self.df['NONCARB'] == 1]
 
         carb_results = self.get_numbers(carb)
         carb_us = self.get_numbers_us(carb)
@@ -30,8 +36,8 @@ class PovertyModule:
         return carb_results, noncarb_results
 
     def get_weighted_data(self):
-        carb = self.df[self.df['TAILPIPE'] == 1]
-        noncarb = self.df[self.df['TAILPIPE'] == 0]
+        carb = self.df[self.df['NONCARB'] == 0]
+        noncarb = self.df[self.df['NONCARB'] == 1]
 
         carb_results = self.get_weighted_numbers(carb)
         carb_us = self.get_weighted_numbers_us(carb)
@@ -50,8 +56,8 @@ class PovertyModule:
             f2 = (df['ASTHMA'] == 1) & (df['POVERTY'] == 1) & (df['EPA Region'] == epa_region)
             f2_bar = (df['POVERTY'] == 1) & (df['EPA Region'] == epa_region)
             try:
-                poverty_count = (df[f1].shape[0] * 100) / df[f1_bar].shape[0]
-                poverty_with_asthma_count = (df[f2].shape[0] * 100) / df[f1_bar].shape[0]
+                poverty_count = (df[f1][self.weighted_col].sum() * 100) / df[f1_bar][self.weighted_col].sum()
+                poverty_with_asthma_count = (df[f2][self.weighted_col].sum()* 100) / df[f1_bar][self.weighted_col].sum()
                 # print(epa_region, poverty_count, poverty_with_asthma_count)
             except:
                 poverty_count, poverty_with_asthma_count = None, None
@@ -69,8 +75,8 @@ class PovertyModule:
         f2 = (df['ASTHMA'] == 1) & (df['POVERTY'] == 1)
         f2_bar = (df['POVERTY'] == 1)
         try:
-            poverty_count = (df[f1].shape[0] * 100) / df.shape[0]
-            poverty_with_asthma_count = (df[f2].shape[0] * 100) / df.shape[0]
+            poverty_count = (df[f1][self.weighted_col].sum() * 100) / df[self.weighted_col].sum()
+            poverty_with_asthma_count = (df[f2][self.weighted_col].sum() * 100) / df[self.weighted_col].sum()
             # print(epa_region, poverty_count, poverty_with_asthma_count)
         except:
             poverty_count, poverty_with_asthma_count = None, None

@@ -17,8 +17,8 @@ class OddsRatio:
         mdf = self.data_obj.get_data_with_epa_region()
         self.results = {}
         mdf = mdf[~mdf['_STATE'].isin(EXCLUDE_STATES)]
-        self.df_carb = mdf[mdf['_STATE'].isin(CARB)]
-        self.df_noncarb = mdf[~mdf['_STATE'].isin(CARB)]
+        self.df_carb = mdf[mdf['_STATE'].isin(ZEV_STATES)]
+        self.df_noncarb = mdf[~mdf['_STATE'].isin(ZEV_STATES)]
         self.carb_regions = self.df_carb['EPA Region'].unique().tolist()
         self.noncarb_regions = self.df_noncarb['EPA Region'].unique().tolist()
         print(self.carb_regions)
@@ -51,10 +51,11 @@ class OddsRatio:
                 X = tdf.drop(['ASTHMA'], axis=1)
                 y = tdf['ASTHMA']
                 # print(epa_region)
-                X = X.astype(float)
+                # X = X.astype(float)
                 result_df, accuracy = self.fit_logistic(X, y)
                 accuracy_dict[epa_region] = accuracy
-                fw = "{}/{}.csv".format(DATA_ODDS_RATIO_MODULE, "EPA Region {} Odds Ratio {}".format(epa_region, self.pop_type))
+                # fw = "{}/{}.csv".format(DATA_ODDS_RATIO_MODULE, "EPA Region {} Odds Ratio {}".format(epa_region, self.pop_type))
+                fw = "{}/weighted/{}.csv".format(DATA_ODDS_RATIO_MODULE, "EPA Region {} Odds Ratio {}".format(epa_region, self.pop_type))
                 odds_ratio[epa_region] = result_df
                 result_df.to_csv(fw)
                 print("Written file {}".format(fw))
@@ -74,5 +75,5 @@ class OddsRatio:
         return np.exp(conf), accuracy
 
 if __name__ == "__main__":
-    obj = OddsRatio(pop_type='CHILD')
+    obj = OddsRatio(pop_type='ADULT')
     obj.get_results()

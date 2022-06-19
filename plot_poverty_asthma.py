@@ -10,7 +10,8 @@ from config import CONFIG
 
 class PlotBar:
     def __init__(self):
-        obj = PovertyModule()
+        self.pop_type = 'ADULT'
+        obj = PovertyModule(self.pop_type)
         self.carb_data, self.noncarb_data = obj.get_data()
         self.cmap = plt.get_cmap("Paired")
         # self.carb_weighted_data, self.noncarb_weighted_data = obj.get_weighted_data()
@@ -61,8 +62,8 @@ class PlotBar:
             x_ticks.append("Non\nCARB")
             plt.bar([x1, x2], [carb_poverty, noncarb_poverty], color=self.cmap(0), width=width)
             plt.bar([x1, x2], [carb_poverty_with_asth, noncarb_poverty_with_asth], color=self.cmap(1), width=width)
-            ax.text(x1-alingnment, carb_poverty_with_asth, "{:.1f}%".format(carb_poverty_with_asth), size=7, color='k', alpha=0.6)
-            ax.text(x2-alingnment, noncarb_poverty_with_asth, "{:.1f}%".format(noncarb_poverty_with_asth), size=7, color='k', alpha=0.6)
+            ax.text(x1-alingnment, carb_poverty_with_asth, "{:.1f}%".format(carb_poverty_with_asth*100/carb_poverty), size=7, color='k', alpha=0.6)
+            ax.text(x2-alingnment, noncarb_poverty_with_asth, "{:.1f}%".format(noncarb_poverty_with_asth*100/noncarb_poverty), size=7, color='k', alpha=0.6)
             row = [epa_region, self.get_one(carb_poverty), self.get_one(noncarb_poverty),
                    self.get_one(carb_poverty_with_asth), self.get_one(noncarb_poverty_with_asth)]
             writer.writerow(row)

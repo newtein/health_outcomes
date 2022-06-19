@@ -7,7 +7,7 @@ import csv
 
 
 class plt_error_bar:
-    def __init__(self, column='TAILPIPE'):
+    def __init__(self, column='NONCARB'):
         self.column = column
         self.results_adult, self.accuracy_adult = OddsRatio(pop_type='ADULT').get_results()
         self.results_child, self.accuracy_child = OddsRatio(pop_type='CHILD').get_results()
@@ -76,8 +76,8 @@ class plt_error_bar:
 
         fw = "{}/{}_{}.png".format(OUTPUT_IMAGE, "Odds_ratio", self.column)
         plt.tight_layout()
-        if self.column == 'TAILPIPE':
-            s = "strict tailpipe standards"
+        if self.column == 'NONCARB':
+            s = "a lack of ZEV and LEV mandates"
         else:
             s = 'poverty'
         epa_regions = sorted(set(epa_regions_adult+epa_regions_child))
@@ -109,8 +109,8 @@ class plt_error_bar:
 
 
 if __name__ == "__main__":
-    obj = plt_error_bar(column='TAILPIPE')
+    obj = plt_error_bar(column='NONCARB')
     obj.execute()
-    obj = plt_error_bar(column='POVERTY')
-    obj.execute()
+    # obj = plt_error_bar(column='POVERTY')
+    # obj.execute()
 
