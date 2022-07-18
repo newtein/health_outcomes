@@ -6,6 +6,8 @@ from calculate_poverty import POVERTY
 from adjust_weights_for_or import AdjustWeightsForOR
 import os
 from copy import deepcopy
+from config import CONFIG
+import constants
 
 
 class ModelingData:
@@ -73,6 +75,10 @@ class ModelingData:
         original_mdf is used for making the demographic tables, whereas mdf is filtered and used to calculate odds
         :return:
         """
+        years = CONFIG.get("analysis_years")
+        years_str = "_".join([str(i) for i in years])
+        CONFIG.update({"analysis_years": years})
+        DATA_ODDS_RATIO_MODULE = constants.DATA_ODDS_RATIO_MODULE + "/{}".format(years_str)
         fname = "{}/BRFSS_{}_OR.csv".format(DATA_ODDS_RATIO_MODULE, self.pop_type)
         # if os.path.exists(fname):
         #     return pd.read_csv(fname)
@@ -114,6 +120,6 @@ class ModelingData:
         mdf = mdf[MODELING_COLUMNS + new_cols]
         mdf = AdjustWeightsForOR(mdf, self.pop_type).execute()
         # mdf.to_csv(fname, index=False)
-        print("File written {}: fname".format(self.pop_type, fname))
+        print("File written {}: {}".format(self.pop_type, fname))
         return mdf
 

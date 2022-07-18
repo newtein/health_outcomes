@@ -15,12 +15,14 @@ class GetData:
     def execute(self):
         dfs = []
         for year in self.years:
+            year = str(year)
             f = self.get_fname(year)
             if os.path.exists(f):
                 df = pd.read_csv(f)
                 print("File already exists: reading now...")
             else:
                 fname = "data/{}/{}/{}".format("BRFSS", year, CONFIG.get('BRFSS').get(year))
+                print(CONFIG.get('BRFSS').get(year), fname)
                 df = pd.read_sas(fname)
                 for i, j in RENAME.items():
                     try:
@@ -28,6 +30,7 @@ class GetData:
                     except:
                         pass
                 df = df[COLUMNS_FOR_ODD_RATIO_FOR_CHILD]
+                df = df[~df["_CLLCPWT"].isna()]
                 df.to_csv(f, index=False)
                 print(fname)
             dfs.append(df)

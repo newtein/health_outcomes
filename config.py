@@ -1,12 +1,13 @@
 CONFIG = {
-    "analysis_years": ["2016", "2017", "2018"],
+    "analysis_years": ["2016", "2017", "2018", "2019", "2020"],
     "epa_regions": [1, 3, 8, 9, 10],
     "disease": 'ASTHMA',
     "BRFSS": {
         "2016": 'LLCP2016.XPT',
         "2017": 'LLCP2017.XPT',
         "2018": 'LLCP2018.XPT',
-        "2019": 'LLCP2019.XPT'
+        "2019": 'LLCP2019.XPT',
+        "2020": 'LLCP2020.XPT'
     },
     "ACBS": {
         "2016" :{
@@ -23,7 +24,7 @@ CONFIG = {
         },
     },
     "CENSUS": {
-        "age_sex": "sc-est2019-agesex-civ.csv"
+        "age_sex": "sc-est_2010_2021_agesex-civ.csv"
     },
     "ASTHMA": {
         "2016": {

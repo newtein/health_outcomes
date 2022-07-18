@@ -3,6 +3,7 @@ from config import CONFIG
 import numpy as np
 from get_trap_incidences import TRAPIncidences
 import pandas as pd
+import math
 
 
 class AdjustWeightsForOR:
@@ -23,31 +24,28 @@ class AdjustWeightsForOR:
         if self.pop_type == 'ADULT':
             self.df['TRAP_ASTHMA'] = self.df['_LLCPWT2'] * self.df['AF']
             self.df['POP_W'] = self.df['_LLCPWT2']
-
             # self.df['POP_W'] = self.df['_LLCPWT2'] / self.df['_LLCPWT2'].min()
         else:
             self.df['TRAP_ASTHMA'] = self.df['_CLLCPWT'] * self.df['AF']
             # self.df['POP_W'] = self.df['_CLLCPWT'] / self.df['_CLLCPWT'].min()
             self.df['POP_W'] = self.df['_CLLCPWT']
 
-        # print(self.df['TRAP_ASTHMA'].isna().mean())
-        # print(self.df[pd.isna(self.df['TRAP_ASTHMA'])])
         self.df = self.df[~pd.isna(self.df['TRAP_ASTHMA'])]
-        #self.df['TRAP_ASTHMA'] = self.df['TRAP_ASTHMA'] / self.df['TRAP_ASTHMA'].min()
+        # self.df['TRAP_ASTHMA'] = self.df['TRAP_ASTHMA'] / self.df['TRAP_ASTHMA'].min()
 
 
         t = []
 
         print(self.df.shape)
-        trap_asthma_w = self.df['TRAP_ASTHMA'].astype(int).tolist()
-        pop_w = self.df['POP_W'].astype(int).tolist()
+        trap_asthma_w = self.df['TRAP_ASTHMA'].apply(math.ceil).tolist()
+        pop_w = self.df['POP_W'].apply(math.ceil).tolist()
         """Try this approach"""
         # new_df = self.df.loc[np.repeat(self.df.index.values, weights)]
 
         """
         Dropping for lesser memory
         """
-        self.df = self.df.drop(['State Name', 'State', 'AF', 'TRAP_ASTHMA', 'POP_W'], axis=1)
+        self.df = self.df.drop(['State Name', 'State', 'AF', 'TRAP_ASTHMA', 'POP_W'], axis=1).reset_index()
 
         columns = self.df.columns
         print("*" * 10)
@@ -74,24 +72,7 @@ class AdjustWeightsForOR:
         del trap_asthma_w
         del pop_w
 
-        # import csv
-        # fname = "temp.csv"
-        # f = open(fname, "w", newline='')
-        # writer = csv.DictWriter(f, columns)
-        # print(columns)
-        # print(t)
-        # writer.writerows(t)
-        # f.close()
 
-        # import csv
-        # fname = "temp.csv"
-        # f = open(fname, "w", newline='')
-        # writer = csv.writer(f)
-        # writer.writerow(columns)
-        # for index, row in enumerate(t):
-        #     writer.writerow([row.get(i) for i in columns])
-        #
-        # f.close()
         print("weighting ended 2/3")
         if self.pop_type == 'ADULT':
             dtype = {'NONCARB': np.int8, '_AGEG5YR': np.int8, 'SEX': np.int8, '_RACE_G1': np.int8, 'POVERTY':np.bool, 'DENSITY': np.int8,

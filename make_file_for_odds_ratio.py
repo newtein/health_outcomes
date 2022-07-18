@@ -28,6 +28,7 @@ class GetData:
                     except:
                         pass
                 df = df[COLUMNS_FOR_ODD_RATIO]
+                df = df[~df["_LLCPWT2"].isna()]
                 df.to_csv(f, index=False)
                 print(fname)
             dfs.append(df)
