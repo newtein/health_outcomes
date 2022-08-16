@@ -24,6 +24,15 @@ class GetData:
                 fname = "data/{}/{}/{}".format("BRFSS", year, CONFIG.get('BRFSS').get(year))
                 print(CONFIG.get('BRFSS').get(year), fname)
                 df = pd.read_sas(fname)
+                if int(year) in [2008, 2009, 2010, 2011, 2012, 2013]:
+                    if int(year) == 2013:
+                        df["_CPRACE"] = df["_CRACE1"]
+                    else:
+                        df["_CPRACE"] = df["_CRACE"]
+                    df["HHADULT"] = df["NUMADULT"]
+                if int(year) in [2008, 2009, 2010]:
+                    df["_CLLCPWT"] = df["_CHILDWT"]
+
                 for i, j in RENAME.items():
                     try:
                         df[j] = df[i]

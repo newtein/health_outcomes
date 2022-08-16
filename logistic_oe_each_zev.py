@@ -14,12 +14,15 @@ from sklmer import LmerRegressor
 
 
 class OddsRatio:
-    def __init__(self, pop_type='ADULT'):
+    def __init__(self, state_code, pop_type='ADULT'):
+        self.state_code = state_code
         self.pop_type = pop_type
         if self.pop_type == 'ADULT':
+            # TODO
+            # ADD statecode for adults
             self.data_obj = ModelingData()
         else:
-            self.data_obj = ModelingDataChild()
+            self.data_obj = ModelingDataChild(state_code=self.state_code)
         mdf = self.data_obj.get_data_with_epa_region()
         self.results = {}
         mdf = mdf[~mdf['_STATE'].isin(EXCLUDE_STATES)]
@@ -124,7 +127,7 @@ class OddsRatio:
                     tdf = self.mdf[self.mdf['EPA Region'] == epa_region]
                 fw = "{}/{}.csv".format(DATA_ODDS_RATIO_MODULE, "EPA Region {} Odds Ratio {}".format(epa_region, self.pop_type))
                 fw_df = "{}/df_{}.csv".format(DATA_ODDS_RATIO_MODULE, "AFv2_EPA0_{}".format(self.pop_type))
-                model_name = "{}/model_{}.h5".format(DATA_ODDS_RATIO_MODULE, "EPA Region {} Odds Ratio {}".format(epa_region, self.pop_type))
+                model_name = "{}/model_{}.h5".format(DATA_ODDS_RATIO_MODULE, "epa_region_{}_{}_zev_{}".format(epa_region, self.pop_type, self.state_code))
                 print("Modeling begin: 1/2")
                 if self.model_type == 'logistic':
                     df_write = self.df_rename(tdf)
@@ -148,7 +151,7 @@ class OddsRatio:
                     print("In except")
                     with open(fw, "w", newline='') as file:
                         file.write(result_df)
-                print("Written file {}".format(fw))
+                print("Written file {} for state {}".format(fw, self.state_code))
                 # print("EPA Region {}".format(epa_region))
         # obj = plt_error_bar(odds_ratio)
         # obj.execute()
@@ -177,5 +180,6 @@ if __name__ == "__main__":
         pass
 
     print(CONFIG.get("analysis_years"))
-    obj = OddsRatio(pop_type='CHILD')
-    obj.get_results()
+    for state_code in ZEV_STATES:
+        obj = OddsRatio(state_code, pop_type='CHILD')
+        obj.get_results()
