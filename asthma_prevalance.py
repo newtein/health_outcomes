@@ -24,7 +24,7 @@ class AsthmaPrevalence:
         return None
 
     def get_df(self):
-        df1 = pd.read_excel(self.fname)
+        df1 = pd.read_excel(self.fname, engine='openpyxl')
         region_df = pd.read_csv(self.fregion)
         region_df = region_df[region_df['State Code'] != 'CC']
 

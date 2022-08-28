@@ -14,22 +14,27 @@ class AdjustWeightsForOR:
         print(self.df.columns)
         print(self.trap_data.columns)
 
+    def resale_weights(self, weight_col):
+        state_weight_df = self.df.groupby(['_STATE'])['year'].apply(set).apply(len).reset_index()
+        state_weight_df['SWEIGHT'] = state_weight_df['year']
+        self.df = self.df.merge(state_weight_df[['_STATE', 'SWEIGHT']], on='_STATE', how='left')
+        self.df[weight_col] = self.df[weight_col] / self.df['SWEIGHT']
+        self.df['TRAP_ASTHMA'] = self.df[weight_col] * self.df['AF']
+        self.df['POP_W'] = self.df[weight_col]
+
     def execute(self):
         print("weighting begin")
         print("Pop type", self.pop_type)
         self.df = self.df.merge(self.trap_data, left_on='State Name', right_on='State', how='left')
         trap_global = CONFIG.get("TRAP_GLOBAL").get("value")
+        self.years = CONFIG.get("analysis_years")
         self.df['AF'] = self.df['AF'].fillna(trap_global)
         self.df['AF'] = self.df['AF'].astype(float)
         if self.pop_type == 'ADULT':
-            self.df['TRAP_ASTHMA'] = self.df['_LLCPWT2'] * self.df['AF']
-            self.df['POP_W'] = self.df['_LLCPWT2']
-            # self.df['POP_W'] = self.df['_LLCPWT2'] / self.df['_LLCPWT2'].min()
+            weight_col = '_LLCPWT2'
         else:
-            self.df['TRAP_ASTHMA'] = self.df['_CLLCPWT'] * self.df['AF']
-            # self.df['POP_W'] = self.df['_CLLCPWT'] / self.df['_CLLCPWT'].min()
-            self.df['POP_W'] = self.df['_CLLCPWT']
-
+            weight_col = '_CLLCPWT'
+        self.resale_weights(weight_col)
         self.df = self.df[~pd.isna(self.df['TRAP_ASTHMA'])]
         # self.df['TRAP_ASTHMA'] = self.df['TRAP_ASTHMA'] / self.df['TRAP_ASTHMA'].min()
 

@@ -8,7 +8,7 @@ class TRAPIncidences:
         self.of = of
 
     def read(self):
-        df = pd.read_excel(TRAP_INCIDENCE)
+        df = pd.read_excel(TRAP_INCIDENCE, engine='openpyxl')
         # if self.of == 'CHILD':
         #     return df[['State', 'AF']]
         # else:

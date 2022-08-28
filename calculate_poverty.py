@@ -48,7 +48,7 @@ class POVERTY:
         income_table = CONFIG.get("POVERTY").get("INCOME_INDEX").get("DATA")
         reported_income = x['INCOME2']
         if pd.isna(reported_income) or (reported_income in [77, 99]):
-            return np.nan
+            return 77
         income = income_table.get(str(int(reported_income)))
         if income <= x['POVERTY_GUIDE']:
             return 1

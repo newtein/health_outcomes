@@ -31,11 +31,8 @@ EXCLUDE_STATES = [4, 8, 10, 11, 27, 35, 42, 53]
 
 ## Odds Ratio
 DATA_ODDS_RATIO_MODULE = "odds_ratio_module/data"
-
 COLUMNS_FOR_ODD_RATIO = ["SMOKE100", "_STATE", "ASTHMA3", "ASTHNOW", "_AGEG5YR", "SEX", "_RACE_G1",
 "INCOME2", "_INCOMG", "EDUCA", "_EDUCAG", "_BMI5", "_BMI5CAT", "CHILDREN", "NUMADULT", "HHADULT", "_CHLDCNT", "_LLCPWT2"]
-
-
 COLUMNS_FOR_ODD_RATIO_FOR_CHILD = ["_STATE", "CASTHDX2", "CASTHNO2", "RCSGENDR", "_CPRACE",
 "INCOME2", "_INCOMG", "CHILDREN", "NUMADULT", "HHADULT", "_CHLDCNT", "_CLLCPWT"]
 
@@ -46,17 +43,24 @@ RENAME  = {
 
 # MODELING_COLUMNS = ["TAILPIPE", "_AGEG5YR", "SEX", "_RACE_G1", 'POVERTY', 'POPEST2017_CIV', "_EDUCAG", "_BMI5CAT",
 #                     "ASTHMA"]
-#
 # MODELING_COLUMNS_FOR_CHILD = ["TAILPIPE", "RCSGENDR", "_CPRACE", 'POVERTY', 'POPEST2017_CIV', "ASTHMA"]
-
-
 # MODELING_COLUMNS = ["NONCARB", "_AGEG5YR", "SEX", "_RACE_G1", 'POVERTY', 'DENSITY', "_EDUCAG", "_BMI5CAT",
 #                     "ASTHMA"]
 
 MODELING_COLUMNS = ["NONCARB", "_AGEG5YR", "SEX", "_RACE_G1", 'POVERTY', 'DENSITY', "_EDUCAG", "_BMI5CAT",
                     "ASTHMA", "_LLCPWT2"]
-
 MODELING_COLUMNS_FOR_CHILD = ["NONCARB", "RCSGENDR"  ,"_CPRACE", 'POVERTY', 'DENSITY', "ASTHMA"]
+
+CENSUS_REGIONS = {
+
+    1: "Connecticut, Maine, Massachusetts, New Hampshire, Rhode Island, Vermont, New Jersey, New York, Pennsylvania",
+    2: "Illinois, Indiana, Michigan, Ohio, Wisconsin, Iowa, Kansas, Minnesota, Missouri, Nebraska, North Dakota, South Dakota",
+    3: "Delaware, Florida, Georgia, Maryland, North Carolina, South Carolina, Virginia, Washington, District Of Columbia, West Virginia, Alabama, Kentucky, Mississippi, Tennessee, Arkansas, Louisiana, Oklahoma, Texas",
+    4: "Arizona, Colorado, Idaho, Montana, Nevada, New Mexico, Utah, Wyoming, Alaska, California, Hawaii, Oregon, Washington"
+
+}
+REGION_DICT = {i: [k.strip() for k in j.split(",")] for i, j in CENSUS_REGIONS.items()}
+REGION_DATA = [[k, i] for i, j in REGION_DICT.items() for k in j]
 
 
 

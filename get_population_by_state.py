@@ -39,6 +39,14 @@ class GetAgeSex:
         pop_estimate_by_age = df.groupby(['STATE', "SEX", "CHILD"]).agg({year_col: 'sum'}).reset_index()
         return pop_estimate_by_age
 
+    def merge_for_state(self, df):
+        epa_region = pd.read_csv("data/states_and_counties.csv")
+        epa_region = epa_region[['State Name', 'State Code']]
+        epa_region = epa_region[epa_region['State Code'] != 'CC']
+        epa_region['State Code'] = epa_region['State Code'].apply(int)
+        epa_region = epa_region.drop_duplicates(['State Code'], keep='first')
+        df = df.merge(epa_region, left_on="_STATE", right_on="State Code", how='left')
+        return df
     def calculate_population_using_weight(self, mdf):
         if self.pop_type == 'CHILD':
             weight_col = '_CLLCPWT'
@@ -49,21 +57,14 @@ class GetAgeSex:
         else:
             year_col = "POPEST{}_CIV".format(self.year)
 
-        columns = ["STATE","NAME", "SEX", "AGE"] + [year_col]
-        df = df[columns]
-        df = df[(df['AGE'] != 999) & (df['SEX'] == 0)]
-        if self.pop_type == 'CHILD':
-            df = df[(df['AGE'] >= 0) & (df['AGE'] < 18)]
         pop_from_weight_df = mdf.groupby(["_STATE"]).agg({weight_col: 'sum'}).reset_index()
-        pop_estimate = df.groupby(['STATE', "NAME", "SEX"]).agg({year_col: 'sum'}).reset_index()
-        pop_estimate[year_col] = np.nan
-        pop_estimate = pop_estimate.merge(pop_from_weight_df, left_on = 'STATE', right_on = '_STATE')
-        pop_estimate[year_col] = pop_estimate[weight_col]
         surface_df = self.get_surface_area_for_density()
-        pop_estimate = pop_estimate.merge(surface_df, left_on='NAME', right_on='State and other areas2', how='left')
-        pop_estimate['DENSITY'] = pop_estimate[year_col] / pop_estimate['surface_area']
-        pop_estimate['population'] = pop_estimate[year_col].tolist()
-        return pop_estimate
+        pop_from_weight_df = self.merge_for_state(pop_from_weight_df)
+        pop_from_weight_df = pop_from_weight_df.merge(surface_df, left_on='State Name', right_on='State and other areas2', how='left')
+        pop_from_weight_df[year_col] = pop_from_weight_df[weight_col]
+        pop_from_weight_df['DENSITY'] = pop_from_weight_df[year_col] / pop_from_weight_df['surface_area']
+        pop_from_weight_df['population'] = pop_from_weight_df[year_col].tolist()
+        return pop_from_weight_df
 
     def read_file_by_population(self):
         fname = "data/{}/{}".format(self.keyword, CONFIG.get(self.keyword).get("age_sex"))
@@ -82,7 +83,7 @@ class GetAgeSex:
         return pop_estimate
 
     def get_surface_area_for_density(self):
-        df = pd.read_excel("data/us_census/state_surface_area.xlsx")
+        df = pd.read_excel("data/us_census/state_surface_area.xlsx", engine='openpyxl')
         col = ['State and other areas2', 'surface_area']
         df['surface_area'] = df['Land_Area_km']
         return df[col]

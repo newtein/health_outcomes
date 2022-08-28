@@ -1,7 +1,7 @@
 import os
 
 refresh = 1
-syear = 2008
+syear = 2015
 eyear = 2020
 fname = "df_AFv2_EPA0_CHILD.csv"
 filepath = "odds_ratio_module/data/{}/{}"
@@ -18,7 +18,7 @@ for year in range(syear, eyear + 1):
     elif model_type == "glm":
         rscript = "Rscript child_glm.R {}".format(rfilepath.format(y, fname))
     if not os.path.exists(pathexists) or refresh:
-        python_cmd = "python logistic_oe.py {}".format(s)
+        python_cmd = "python3 logistic_oe.py {}".format(s)
         print("Executing: ", python_cmd)
         os.system(python_cmd)
         print("Done")
