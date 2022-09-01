@@ -17,11 +17,12 @@ import warnings
 warnings.filterwarnings("ignore")
 
 class OddsRatio:
-    def __init__(self, pop_type='ADULT', state_code = None, write_file=True, identifier=''):
+    def __init__(self, pop_type='ADULT', state_code = None, write_file=True, identifier='', other_filters={}):
         self.write_file = write_file
         self.state_code = state_code
         self.identifier = identifier
         self.pop_type = pop_type
+        self.other_filters = other_filters
 
         years = CONFIG.get("analysis_years")
         years_str = "_".join([str(i) for i in years])
@@ -34,7 +35,7 @@ class OddsRatio:
         if self.pop_type == 'ADULT':
             self.data_obj = ModelingData()
         else:
-            self.data_obj = ModelingDataChild(state_code=state_code)
+            self.data_obj = ModelingDataChild(state_code=state_code, other_filters=self.other_filters)
         mdf = self.data_obj.get_data_with_epa_region()
         self.results = {}
         mdf = mdf[~mdf['_STATE'].isin(EXCLUDE_STATES)]

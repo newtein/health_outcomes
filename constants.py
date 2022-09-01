@@ -10,12 +10,13 @@ MANDATORY_BRFSS_COLUMNS = ["_STATE", "FMONTH", "IDATE", "IMONTH", "IDAY", "IYEAR
                     "CASTHDX2", "CASTHNO2", "_CHISPNC", "_CRACE1",
                     "_CPRACE", "_HCVU651", "_LTASTH1", "_CASTHM1", "_ASTHMS1",
                     "_PRACE1", "_MRACE1", "_RACEG21", "_CHLDCNT", "_INCOMG",
-                    "_SMOKER3", "_RFSMOK3", "_LLCPWT2", "_CLLCPWT"]
+                    "_SMOKER3", "_RFSMOK3", "_LLCPWT2", "_CLLCPWT", "MSCODE"]
 
 OUTPUT_FILE = 'output_files'
 OUTPUT_IMAGE = 'output_images'
 US_CENSUS_DIR = "us_census"
 TRAP_INCIDENCE = 'data/TRAP/khreis_2021.xlsx'
+TRAP_INCIDENCE_v2 = 'gujral_sme_trap.csv'
 CENSUS_DATA_PATH = US_CENSUS_DIR+"/2010_2019_population.csv"
 
 # California, Connecticut, Maine, Maryland, Massachusetts, New Jersey, New York, Oregon, Rhode Island, Vermont
@@ -32,9 +33,9 @@ EXCLUDE_STATES = [4, 8, 10, 11, 27, 35, 42, 53]
 ## Odds Ratio
 DATA_ODDS_RATIO_MODULE = "odds_ratio_module/data"
 COLUMNS_FOR_ODD_RATIO = ["SMOKE100", "_STATE", "ASTHMA3", "ASTHNOW", "_AGEG5YR", "SEX", "_RACE_G1",
-"INCOME2", "_INCOMG", "EDUCA", "_EDUCAG", "_BMI5", "_BMI5CAT", "CHILDREN", "NUMADULT", "HHADULT", "_CHLDCNT", "_LLCPWT2"]
+"INCOME2", "_INCOMG", "EDUCA", "_EDUCAG", "_BMI5", "_BMI5CAT", "CHILDREN", "NUMADULT", "HHADULT", "_CHLDCNT", "_LLCPWT2", "MSCODE"]
 COLUMNS_FOR_ODD_RATIO_FOR_CHILD = ["_STATE", "CASTHDX2", "CASTHNO2", "RCSGENDR", "_CPRACE",
-"INCOME2", "_INCOMG", "CHILDREN", "NUMADULT", "HHADULT", "_CHLDCNT", "_CLLCPWT"]
+"INCOME2", "_INCOMG", "CHILDREN", "NUMADULT", "HHADULT", "_CHLDCNT", "_CLLCPWT", "MSCODE"]
 
 RENAME  = {
     "SEX1": "SEX",

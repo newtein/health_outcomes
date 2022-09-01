@@ -10,7 +10,7 @@ class AdjustWeightsForOR:
     def __init__(self, df, pop_type):
         self.df= df
         self.pop_type = pop_type
-        self.trap_data = TRAPIncidences(of=self.pop_type).read()
+        self.trap_data = TRAPIncidences(of=self.pop_type).read_v2()
         print(self.df.columns)
         print(self.trap_data.columns)
 

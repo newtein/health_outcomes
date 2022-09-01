@@ -10,8 +10,14 @@ if __name__ == "__main__":
     CONFIG.update({"analysis_years": years})
 
     for state_code in ZEV_STATES:
-        try:
-            obj = OddsRatio(state_code=state_code, pop_type='CHILD', write_file=False, identifier=state_code)
-            obj.get_results()
-        except Exception as e:
-            print("Error with state {}".format(state_code), e)
+        for urban_cluster in [1,2,3]:
+            try:
+                identifier = "{}_urban_{}".format(state_code, urban_cluster)
+                other_filters ={
+                    "MSCODE": urban_cluster
+                }
+                obj = OddsRatio(state_code=state_code, pop_type='CHILD', write_file=False, identifier=identifier,
+                                other_filters=other_filters)
+                obj.get_results()
+            except Exception as e:
+                print("Error with state {}".format(state_code), e)

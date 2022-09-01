@@ -15,9 +15,10 @@ class ModelingDataChild:
     """
     TODO: make dynamic population year selection, currently use 2017 (median year of the current analysis)
     """
-    def __init__(self, state_code=None):
+    def __init__(self, state_code=None, other_filters={}):
         self.state_code = state_code
         self.pop_type = 'CHILD'
+        self.other_filters = other_filters
         self.dfs = GetData().execute()
 
     def if_carb(self, x):
@@ -91,6 +92,27 @@ class ModelingDataChild:
         df['_CPRACE'] = df['_CPRACE'].replace(race_dict)
         return df
 
+    def apply_msa_filter(self, df, msa_value):
+        return df[df["MSCODE"]==msa_value]
+
+    def apply_other_filters(self, df):
+        print("Before MSCODE: {}".format(df.shape))
+        msa_value = self.other_filters.get("MSCODE")
+        if msa_value:
+            df = self.filter_metropolitan(df)
+            df = self.apply_msa_filter(df, msa_value)
+            print("After MSCODE: {}".format(df.shape))
+        return df
+
+    def filter_metropolitan(self, df):
+        # 1: urbanized
+        # 2, 3, 4: urban
+        # 5: rural
+        urban_dict = {1:1, 2:2, 3:2, 4:2, 5:3}
+        df['MSCODE'] = df['MSCODE'].fillna(77)
+        df['MSCODE'] = df['MSCODE'].replace(urban_dict)
+        return df
+
     def get_data_with_epa_region(self):
         years = CONFIG.get("analysis_years")
         years_str = "_".join([str(i) for i in years])
@@ -111,6 +133,7 @@ class ModelingDataChild:
         mdf = self.get_primary_exposure(mdf)
         mdf = self.get_primary_risk_wrap(mdf)
         mdf = self.group_race(mdf)
+        mdf = self.apply_other_filters(mdf)
         mdf = POVERTY(mdf).process()
 
         new_cols = ["State Name", "_STATE", 'EPA Region', '_CLLCPWT', 'year']
