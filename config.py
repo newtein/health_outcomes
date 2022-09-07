@@ -22,16 +22,16 @@ CONFIG = {
             "CHILD": "ACBS_2008_CHILD_PUBLIC.sas7bdat"
         },
         "2009": {
-            "CHILD": "acbs_2009_adult_public.sas7bdat"
+            "CHILD": "acbs_2009_child_public.sas7bdat"
         },
         "2010": {
             "CHILD": "acbs_2010_child_public.sas7bdat"
         },
         "2011": {
-            "CHILD": "ACBS_2011_CHILD_PUBLIC.sas7bdat"
+            "CHILD": "acbs_2011_child_public.sas7bdat"
         },
         "2012": {
-            "CHILD": "acbs_2012_adult_public_llcp.sas7bdat"
+            "CHILD": "acbs_2012_child_public_llcp.sas7bdat"
         },
         "2013": {
             "CHILD": "acbs_2013_child_public_llcp.sas7bdat"

@@ -4,6 +4,7 @@ import numpy as np
 from get_trap_incidences import TRAPIncidences
 import pandas as pd
 import math
+from asthma_incidence_cases import AsthmaIncidenceCases
 
 
 class AdjustWeightsForOR:
@@ -19,21 +20,50 @@ class AdjustWeightsForOR:
         state_weight_df['SWEIGHT'] = state_weight_df['year']
         self.df = self.df.merge(state_weight_df[['_STATE', 'SWEIGHT']], on='_STATE', how='left')
         self.df[weight_col] = self.df[weight_col] / self.df['SWEIGHT']
-        self.df['TRAP_ASTHMA'] = self.df[weight_col] * self.df['AF']
+        self.df['TRAP_ASTHMA'] = self.df[weight_col] * self.df['IR'] * self.df['AF']
         self.df['POP_W'] = self.df[weight_col]
+
+
+    def calculate_PR_IR(self, df, weight_col):
+        ever_asthma = (df['ASTHMA'] == 1)
+        print(df[ever_asthma])
+        total_burden_df = df[ever_asthma].groupby(['_STATE'])[weight_col].sum().reset_index()
+        total_burden_df['total_asthma_burden'] = total_burden_df[weight_col]
+
+        total_pop_df = df.groupby(['_STATE'])[weight_col].sum().reset_index()
+        total_pop_df['total_pop'] = total_pop_df[weight_col]
+
+        prevelence_df = total_pop_df[['_STATE', 'total_pop']].merge(total_burden_df[['_STATE', 'total_asthma_burden']], how='left', on='_STATE')
+        prevelence_df['PR'] = prevelence_df['total_asthma_burden']/prevelence_df['total_pop']
+        prevelence_df['at_risk'] = prevelence_df['total_pop'] - prevelence_df['total_asthma_burden']
+        years = CONFIG.get("analysis_years")
+        incidence_df = AsthmaIncidenceCases(years, pop_type=self.pop_type).get_cases()
+        mdf = prevelence_df.merge(incidence_df[['_STATE', 'num']], on='_STATE', how='left')
+        exp_df = mdf.dropna()
+        national_incidence = exp_df['num'].sum()/exp_df['at_risk'].sum()
+        mdf['IR'] = mdf['num']/mdf['at_risk']
+        mdf['IR'] = mdf['IR'].fillna(national_incidence)
+
+        wdf = mdf.merge(df, on='')
+        years = CONFIG.get("analysis_years")
+        years_str = "_".join([str(i) for i in years])
+        fw = DATA_ODDS_RATIO_MODULE + "/{}/PR_IR.csv".format(years_str)
+        mdf.to_csv(fw)
+        df = df.merge(mdf, how='left', on='_STATE')
+        return df
 
     def execute(self):
         print("weighting begin")
         print("Pop type", self.pop_type)
-        self.df = self.df.merge(self.trap_data, left_on='State Name', right_on='State', how='left')
-        trap_global = CONFIG.get("TRAP_GLOBAL").get("value")
+        self.df = self.df.merge(self.trap_data, right_on=['State Code', 'year'], left_on=['_STATE', 'year'], how='left')
         self.years = CONFIG.get("analysis_years")
-        self.df['AF'] = self.df['AF'].fillna(trap_global)
         self.df['AF'] = self.df['AF'].astype(float)
         if self.pop_type == 'ADULT':
             weight_col = '_LLCPWT2'
         else:
             weight_col = '_CLLCPWT'
+
+        self.df = self.calculate_PR_IR(self.df, weight_col=weight_col)
         self.resale_weights(weight_col)
         self.df = self.df[~pd.isna(self.df['TRAP_ASTHMA'])]
         # self.df['TRAP_ASTHMA'] = self.df['TRAP_ASTHMA'] / self.df['TRAP_ASTHMA'].min()
@@ -47,7 +77,7 @@ class AdjustWeightsForOR:
         """
         Dropping for lesser memory
         """
-        self.df = self.df.drop(['State Name', 'State', 'AF', 'TRAP_ASTHMA', 'POP_W'], axis=1).reset_index()
+        self.df = self.df.drop(['State Name', 'AF', 'TRAP_ASTHMA', 'POP_W'], axis=1).reset_index()
 
         columns = self.df.columns
         for index, row in self.df.iterrows():

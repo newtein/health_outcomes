@@ -7,7 +7,7 @@ import os
 
 class ReadACBS:
     def __init__(self, year, of='ADULT'):
-        self.year = year
+        self.year = str(year)
         self.of = of
         self.keyword = "ACBS"
         self.filename = self.get_filename()
@@ -19,17 +19,25 @@ class ReadACBS:
 
     def get_df(self, all=False):
         df = ReadSAS().get_df(self.filename)
+        if self.year in ['2008', '2009', '2010']:
+            df['CLLCPWT_F'] = df['CHILDWT_F']
+        if self.year == '2011':
+            df['CLLCPWT_F'] = df['CLANDWT_F']
         try:
             """
             Handling inconsistencies in the files
             """
-            df['_state'] = df['_STATE']
-            df['seqno'] = df['SEQNO']
+            df['_STATE'] = df['_state']
+        except:
+            pass
+        try:
+            df['SEQNO'] = df['seqno']
+
         except:
             pass
         return df
 
 
 if __name__ == "__main__":
-    obj = ReadACBS('2017')
+    obj = ReadACBS('2009', of='CHILD')
     print(obj.get_df().head(2))

@@ -16,8 +16,9 @@ OUTPUT_FILE = 'output_files'
 OUTPUT_IMAGE = 'output_images'
 US_CENSUS_DIR = "us_census"
 TRAP_INCIDENCE = 'data/TRAP/khreis_2021.xlsx'
-TRAP_INCIDENCE_v2 = 'gujral_sme_trap.csv'
+TRAP_INCIDENCE_v2 = 'data/TRAP/gujral_sme_trap.csv'
 CENSUS_DATA_PATH = US_CENSUS_DIR+"/2010_2019_population.csv"
+ATMOS_BY_STATE = 'data/ATMOS_VOL/atmos_size_by_state.csv'
 
 # California, Connecticut, Maine, Maryland, Massachusetts, New Jersey, New York, Oregon, Rhode Island, Vermont
 ZEV_STATES = [6, 9, 23, 24,25, 34, 36, 41, 44, 50]

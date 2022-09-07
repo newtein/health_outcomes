@@ -17,6 +17,7 @@ class TRAPIncidences:
         return df[['State', 'AF']]
 
     def read_v2(self):
-        columns = ['State Code', 'year', 'concentration', 'concentration_5', 'concentration_95', 'AF', 'AF_5', 'AF_95']
-        df = pd.read_excel(TRAP_INCIDENCE_v2, engine='openpyxl')
+        # columns = ['State Code', 'year', 'concentration', 'concentration_5', 'concentration_95', 'AF', 'AF_5', 'AF_95']
+        columns = ['State Code', 'year', 'concentration','AF']
+        df = pd.read_csv(TRAP_INCIDENCE_v2)
         return df[columns]

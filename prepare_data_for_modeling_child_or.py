@@ -113,6 +113,8 @@ class ModelingDataChild:
         df['MSCODE'] = df['MSCODE'].replace(urban_dict)
         return df
 
+
+
     def get_data_with_epa_region(self):
         years = CONFIG.get("analysis_years")
         years_str = "_".join([str(i) for i in years])
@@ -133,7 +135,7 @@ class ModelingDataChild:
         mdf = self.get_primary_exposure(mdf)
         mdf = self.get_primary_risk_wrap(mdf)
         mdf = self.group_race(mdf)
-        mdf = self.apply_other_filters(mdf)
+        # mdf = self.apply_other_filters(mdf)
         mdf = POVERTY(mdf).process()
 
         new_cols = ["State Name", "_STATE", 'EPA Region', '_CLLCPWT', 'year']
