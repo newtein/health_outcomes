@@ -88,6 +88,22 @@ class GetAgeSex:
         df['surface_area'] = df['Land_Area_km']
         return df[col]
 
+    def get_surface_area_with_state_code(self):
+        df = pd.read_excel("data/us_census/state_surface_area.xlsx", engine='openpyxl')
+        col = ['State and other areas2', 'surface_area']
+        df['surface_area'] = df['Land_Area_km']
+        epa_df = self.get_epa_region_df()
+        mdf = epa_df.merge(df[col], left_on='State Name', right_on='State and other areas2', how='left')
+        return mdf
+
+    def get_epa_region_df(self):
+        epa_region = pd.read_csv("data/states_and_counties.csv")
+        epa_region = epa_region[['State Name', 'State Code']]
+        epa_region = epa_region[epa_region['State Code'] != 'CC']
+        epa_region['State Code'] = epa_region['State Code'].apply(int)
+        epa_region = epa_region.drop_duplicates(['State Code'], keep='first')
+        return epa_region
+
     def read_by_state(self, state_code):
         """
         SEX

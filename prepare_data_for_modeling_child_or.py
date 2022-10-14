@@ -4,6 +4,8 @@ from make_file_for_odds_ratio_child import GetData
 import pandas as pd
 from get_population_by_state import GetAgeSex
 from calculate_poverty import POVERTY
+from calculate_PR_IR import PRIR
+from AF_calculations.calculate_AF import calculateAF
 from adjust_weights_for_or import AdjustWeightsForOR
 from config import CONFIG
 from constants import *
@@ -12,12 +14,11 @@ import numpy as np
 
 
 class ModelingDataChild:
-    """
-    TODO: make dynamic population year selection, currently use 2017 (median year of the current analysis)
-    """
-    def __init__(self, state_code=None):
+    def __init__(self, state_code=None, other_filters={}, measurement_type='no2'):
         self.state_code = state_code
         self.pop_type = 'CHILD'
+        self.other_filters = other_filters
+        self.measurement_type = measurement_type
         self.dfs = GetData().execute()
 
     def if_carb(self, x):
@@ -41,20 +42,16 @@ class ModelingDataChild:
         zev_states_but_not_our_state = [i for i in ZEV_STATES if i != self.state_code]
         df = df[~df['_STATE'].isin(zev_states_but_not_our_state)]
         df = df[df['region_code'] == acceptable_region].reset_index()
-        print("Unique States: {}", df['State Name'].unique())
         return df
 
     def merge_for_density(self, df, year):
         population__df = GetAgeSex(str(year), pop_type=self.pop_type).calculate_population_using_weight(df)
         population__df = population__df[population__df['_STATE'] != 0]
-        print(population__df['DENSITY'].dtype)
         df = df.merge(population__df[['_STATE', 'DENSITY', 'surface_area', 'population']], left_on="_STATE",
                               right_on="_STATE", how="left")
         return df
 
     def filtering_nan_state(self, df):
-        print("No States Found for: {}", df[pd.isna(df["_STATE"])]["_STATE"].unique())
-        print(df[pd.isna(df["_STATE"])])
         df = df[~pd.isna(df["_STATE"])]
         return df
 
@@ -75,7 +72,6 @@ class ModelingDataChild:
     def get_primary_exposure(self, df):
         if self.state_code:
             df['NONCARB'] = df['_STATE'].apply(self.if_state)
-            # mdf = self.filter_state_based_on_census_region(mdf)
         else:
             df['NONCARB'] = df['_STATE'].apply(self.if_carb)
         return df
@@ -89,6 +85,27 @@ class ModelingDataChild:
     def group_race(self, df):
         race_dict = {1.0:1, 2.0:2, 3.0: 3, 4.0: 4, 5.0:5, 6.0:5, 7.0:5, 8.0: 5, 77.0:77, 99.0:77}
         df['_CPRACE'] = df['_CPRACE'].replace(race_dict)
+        return df
+
+    def apply_msa_filter(self, df, msa_value):
+        return df[df["MSCODE"]==msa_value]
+
+    def apply_other_filters(self, df):
+        print("Before MSCODE: {}".format(df.shape))
+        msa_value = self.other_filters.get("MSCODE")
+        if msa_value:
+            df = self.filter_metropolitan(df)
+            df = self.apply_msa_filter(df, msa_value)
+            print("After MSCODE: {}".format(df.shape))
+        return df
+
+    def filter_metropolitan(self, df):
+        # 1: urbanized
+        # 2, 3, 4: urban
+        # 5: rural
+        urban_dict = {1:1, 2:2, 3:2, 4:2, 5:3}
+        df['MSCODE'] = df['MSCODE'].fillna(77)
+        df['MSCODE'] = df['MSCODE'].replace(urban_dict)
         return df
 
     def get_data_with_epa_region(self):
@@ -111,13 +128,22 @@ class ModelingDataChild:
         mdf = self.get_primary_exposure(mdf)
         mdf = self.get_primary_risk_wrap(mdf)
         mdf = self.group_race(mdf)
+        # mdf = self.apply_other_filters(mdf)
         mdf = POVERTY(mdf).process()
 
         new_cols = ["State Name", "_STATE", 'EPA Region', '_CLLCPWT', 'year']
-
         mdf = mdf[MODELING_COLUMNS_FOR_CHILD+new_cols]
-        mdf = AdjustWeightsForOR(mdf, self.pop_type).execute()
-        print("aa", mdf['year'].unique())
+        pr_ir_df, national_avg_row = PRIR(self.pop_type).get_df(mdf, '_CLLCPWT')
+        years = CONFIG.get("analysis_years")
+        # picking up the middle year/last year in the series (most recent population)
+        year = years[0] if len(years) == 1 else years[-1]
+        af_df = calculateAF(pr_ir_df, national_avg_row, year, measurement_type=self.measurement_type).get_df()
+        # dont rescale in case of singular matrix, as in, state didn't participate (less than 2 binary outcomes)
+        if len(mdf['NONCARB'].unique().tolist()) == 2:
+            print("Rescaling")
+            mdf = AdjustWeightsForOR(mdf, af_df, self.pop_type).execute()
+        else:
+            print("State {} not participated in this year.".format(self.state_code))
         # not writing the file to save up space
         # mdf.to_csv(fname, index=False)
         print("File written {}: {}".format(self.pop_type, fname))

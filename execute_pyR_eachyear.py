@@ -1,8 +1,8 @@
 import os
 
 refresh = 1
-syear = 2015
-eyear = 2020
+syear = 2010
+eyear = 2019
 fname = "df_AFv2_EPA0_CHILD.csv"
 filepath = "odds_ratio_module/data/{}/{}"
 rfilepath = "odds_ratio_module/data/{}/{}"

@@ -18,6 +18,30 @@ CONFIG = {
         "2020": 'LLCP2020.XPT'
     },
     "ACBS": {
+        "2008": {
+            "CHILD": "ACBS_2008_CHILD_PUBLIC.sas7bdat"
+        },
+        "2009": {
+            "CHILD": "acbs_2009_child_public.sas7bdat"
+        },
+        "2010": {
+            "CHILD": "acbs_2010_child_public.sas7bdat"
+        },
+        "2011": {
+            "CHILD": "acbs_2011_child_public.sas7bdat"
+        },
+        "2012": {
+            "CHILD": "acbs_2012_child_public_llcp.sas7bdat"
+        },
+        "2013": {
+            "CHILD": "acbs_2013_child_public_llcp.sas7bdat"
+        },
+        "2014": {
+            "CHILD": "ACBS_2014_CHILD_PUBLIC_LLCP.sas7bdat"
+        },
+        "2015": {
+            "CHILD": "ACBS_2015_CHILD_PUBLIC_LLCP.sas7bdat"
+        },
         "2016" :{
             "ADULT": "acbs_2016_adult_public_llcp.sas7bdat",
             "CHILD": "acbs_2016_child_public_llcp.sas7bdat"
@@ -29,6 +53,9 @@ CONFIG = {
         "2018": {
             "ADULT": "acbs_2018_adult_public_llcp.sas7bdat",
             "CHILD": "acbs_2018_child_public_llcp.sas7bdat"
+        },
+        "2019": {
+            "CHILD": "acbs_2019_child_public_llcp.sas7bdat"
         },
     },
     "CENSUS": {

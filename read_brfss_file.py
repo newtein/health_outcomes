@@ -35,4 +35,4 @@ class ReadBRFSS:
 
 if __name__ == "__main__":
     obj = ReadBRFSS('2017')
-    print(obj.get_df().head(2))
+    print(obj.get_df().head(10))
