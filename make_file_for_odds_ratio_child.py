@@ -40,6 +40,7 @@ class GetData:
                         pass
                 df = df[COLUMNS_FOR_ODD_RATIO_FOR_CHILD]
                 df = df[~df["_CLLCPWT"].isna()]
+                df['_STATE'] = df['_STATE'].astype(int)
                 df.to_csv(f, index=False)
                 print(fname)
             dfs.append(df)

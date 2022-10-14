@@ -15,7 +15,10 @@ class AsthmaIncidenceCases:
         self.df = pd.DataFrame()
         self.year_id = "_".join([str(i) for i in self.years])
         for year in self.years:
-            tdf = ReadACBS(year, of='CHILD').get_df()
+            try:
+                tdf = ReadACBS(year, of='CHILD').get_df()
+            except:
+                tdf = pd.DataFrame()
             tdf['year'] = year
             self.df = self.df.append(tdf)
         self.resale_weights('CLLCPWT_F')

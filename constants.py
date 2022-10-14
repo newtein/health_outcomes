@@ -19,6 +19,8 @@ TRAP_INCIDENCE = 'data/TRAP/khreis_2021.xlsx'
 TRAP_INCIDENCE_v2 = 'data/TRAP/gujral_sme_trap.csv'
 CENSUS_DATA_PATH = US_CENSUS_DIR+"/2010_2019_population.csv"
 ATMOS_BY_STATE = 'data/ATMOS_VOL/atmos_size_by_state.csv'
+# POP_LUR_FILE = 'data/lur_no2/lur_no2_merged_with_pop.csv'
+AMBIENT_AIR_DATA = "data/ambient_no2"
 
 # California, Connecticut, Maine, Maryland, Massachusetts, New Jersey, New York, Oregon, Rhode Island, Vermont
 ZEV_STATES = [6, 9, 23, 24,25, 34, 36, 41, 44, 50]
@@ -29,7 +31,20 @@ ZEV_STATES = [6, 9, 23, 24,25, 34, 36, 41, 44, 50]
 # 4 CARB states don't have ZEV mandates
 # 2 states AZ and NM has LEV repealed
 # Colarado and Manisota has ZEV, but model year are well-beyound (2022).
-EXCLUDE_STATES = [4, 8, 10, 11, 27, 35, 42, 53]
+# EXCLUDE_STATES = [4, 8, 10, 11, 27, 35, 42, 53]
+
+## Update 1: we are not excluding LEV states (they will be treated as NonZEV states); also places where ZEV is repealed
+# Colarado (8, zev MY 2022),
+#  Minnesota (27, 2025, https://www.greencarreports.com/news/1133027_minnesota-adopts-california-ev-mandate-makes-it-tougher-for-plug-in-compliance-cars),
+# Nevada (32)
+# New Mexico (35, https://westernresourceadvocates.org/blog/new-mexico-adopts-clean-cars-standards/)
+# Virginia (51, 2025, https://www.greencarcongress.com/2021/03/20210330-virginia.html)
+# EXCLUDE_STATES = [8, 27, 32, 35, 51]
+
+## Update 2: I'm considering the states that have adopted ZEV after model year 2021 as Other states
+# Do need to remove anything
+EXCLUDE_STATES = []
+
 
 ## Odds Ratio
 DATA_ODDS_RATIO_MODULE = "odds_ratio_module/data"
@@ -51,7 +66,7 @@ RENAME  = {
 
 MODELING_COLUMNS = ["NONCARB", "_AGEG5YR", "SEX", "_RACE_G1", 'POVERTY', 'DENSITY', "_EDUCAG", "_BMI5CAT",
                     "ASTHMA", "_LLCPWT2"]
-MODELING_COLUMNS_FOR_CHILD = ["NONCARB", "RCSGENDR"  ,"_CPRACE", 'POVERTY', 'DENSITY', "ASTHMA"]
+MODELING_COLUMNS_FOR_CHILD = ["NONCARB", "RCSGENDR"  ,"_CPRACE", 'POVERTY', "ASTHMA"]
 
 CENSUS_REGIONS = {
 

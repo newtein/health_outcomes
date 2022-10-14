@@ -9,6 +9,7 @@ from sklearn.metrics import accuracy_score
 from config import CONFIG
 import sys
 import pandas as pd
+from imblearn.over_sampling import SMOTE
 #from pymer4.models import Lmer
 #from pymer4.io import save_model, load_model
 #from sklmer import LmerRegressor
@@ -17,12 +18,15 @@ import warnings
 warnings.filterwarnings("ignore")
 
 class OddsRatio:
-    def __init__(self, pop_type='ADULT', state_code = None, write_file=True, identifier='', other_filters={}):
+    def __init__(self, pop_type='ADULT', state_code = None, write_file=True, identifier='', other_filters={},
+                 use_smote=False, measurement_type = 'no2'):
         self.write_file = write_file
         self.state_code = state_code
         self.identifier = identifier
         self.pop_type = pop_type
         self.other_filters = other_filters
+        self.use_smote = use_smote
+        self.measurement_type = measurement_type
 
         years = CONFIG.get("analysis_years")
         years_str = "_".join([str(i) for i in years])
@@ -35,7 +39,7 @@ class OddsRatio:
         if self.pop_type == 'ADULT':
             self.data_obj = ModelingData()
         else:
-            self.data_obj = ModelingDataChild(state_code=state_code, other_filters=self.other_filters)
+            self.data_obj = ModelingDataChild(state_code=state_code, other_filters=self.other_filters, measurement_type=measurement_type)
         mdf = self.data_obj.get_data_with_epa_region()
         self.results = {}
         mdf = mdf[~mdf['_STATE'].isin(EXCLUDE_STATES)]
@@ -43,8 +47,6 @@ class OddsRatio:
         self.df_noncarb = mdf[~mdf['_STATE'].isin(ZEV_STATES)]
         self.carb_regions = self.df_carb['EPA Region'].unique().tolist()
         self.noncarb_regions = self.df_noncarb['EPA Region'].unique().tolist()
-        print(self.carb_regions)
-        print(self.noncarb_regions)
         self.mdf = mdf
         self.model_type = "logistic"
 
@@ -87,8 +89,18 @@ class OddsRatio:
         tdf = pd.get_dummies(tdf, columns=one_hot)
         X = tdf.drop(['ASTHMA'], axis=1)
         y = tdf['ASTHMA']
-        result_df, accuracy = self.fit_logistic(X, y)
-        return result_df, accuracy
+        go_forward = True if len(set(tdf['NONCARB'].unique().tolist())) == 2 else False
+        if go_forward:
+            try:
+                result_df, accuracy = self.fit_logistic(X.astype(float), y)
+                return result_df, accuracy
+            except Exception as e:
+                print("ERROR!!", e)
+                print(X.isna().sum())
+                return pd.DataFrame(), np.nan
+        else:
+            print("State {} not participated in this year".format(self.state_code))
+            return pd.DataFrame(), np.nan
 
     def create_mixed_model(self, df):
         # formula = "ASTHMA  ~ ZEV_MANDATES + GENDER + RACE + POVERTY + DENSITY + YEAR  + (1|STATE) + (1|EPA_REGION)"
@@ -105,7 +117,7 @@ class OddsRatio:
         )
         print("Modeling begin: 2/2")
         result_df = nm_estimator.fit(data=df).get_params()
-        print("Modeling end: 1/2")
+        print("Modeling end: 1/2...")
         return result_df, 100, nm_estimator
 
     def get_results(self):
@@ -154,6 +166,9 @@ class OddsRatio:
         return odds_ratio, accuracy_dict
 
     def fit_logistic(self, X, y):
+        if self.use_smote:
+            smote = SMOTE(random_state=32)
+            X, y = smote.fit_resample(X, y)
         res = sm.Logit(y, X).fit()
         params = res.params
         conf = res.conf_int()
@@ -161,6 +176,7 @@ class OddsRatio:
         conf.columns = ['5%', '95%', 'Odds Ratio']
         y_pred = res.predict(X).apply(lambda x: 0 if x<0.5 else 1).tolist()
         accuracy = accuracy_score(y, y_pred)
+        print("Accuracy", accuracy)
         return np.exp(conf), accuracy
 
 if __name__ == "__main__":
@@ -170,5 +186,5 @@ if __name__ == "__main__":
 
 
     print(CONFIG.get("analysis_years"))
-    obj = OddsRatio(pop_type='CHILD')
+    obj = OddsRatio(pop_type='CHILD', measurement_type='pm2.5')
     obj.get_results()
