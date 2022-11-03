@@ -1,4 +1,7 @@
 import os
+import sys
+
+measurement_type = sys.argv[1]
 
 refresh = 1
 syear = 2010
@@ -18,7 +21,7 @@ for year in range(syear, eyear + 1):
     elif model_type == "glm":
         rscript = "Rscript child_glm.R {}".format(rfilepath.format(y, fname))
     if not os.path.exists(pathexists) or refresh:
-        python_cmd = "python3 logistic_oe.py {}".format(s)
+        python_cmd = "python3 logistic_oe.py {} {}".format(measurement_type, s)
         print("Executing: ", python_cmd)
         os.system(python_cmd)
         print("Done")

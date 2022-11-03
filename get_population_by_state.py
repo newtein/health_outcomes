@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 class GetAgeSex:
-    def __init__(self, year, pop_type='ADULT'):
+    def __init__(self, year, pop_type='CHILD'):
         self.year = year
         self.keyword = "CENSUS"
         self.pop_col = 'POPEST{}_CIV'.format(self.year)

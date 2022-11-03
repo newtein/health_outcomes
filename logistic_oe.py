@@ -141,7 +141,7 @@ class OddsRatio:
                         df_write = self.df_rename(tdf)
                         df_write.to_csv(fw_df, index=False)
                     tdf = self.process(tdf)
-                    result_df, accuracy = self.create_logistic_model(tdf)
+                    # result_df, accuracy = self.create_logistic_model(tdf)
                 elif self.model_type == 'mixed':
                     # df1 = tdf.query('ASTHMA == 1').sample(10)
                     # df2 = tdf.query('ASTHMA == 0').sample(10)
@@ -180,11 +180,11 @@ class OddsRatio:
         return np.exp(conf), accuracy
 
 if __name__ == "__main__":
-
-    years = [int(i) for i in sys.argv[1:]]
+    measurement_type = sys.argv[1]
+    years = [int(i) for i in sys.argv[2:]]
     CONFIG.update({"analysis_years": years})
 
 
     print(CONFIG.get("analysis_years"))
-    obj = OddsRatio(pop_type='CHILD', measurement_type='pm2.5')
+    obj = OddsRatio(pop_type='CHILD', measurement_type=measurement_type)
     obj.get_results()
